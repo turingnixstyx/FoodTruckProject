@@ -9,16 +9,10 @@ from django.core.serializers import serialize
 
 
 class TruckModelCreateView(View):
-    def post(self, request):
-        data = json.loads(request.body.decode('utf-8'))
-        x_coordinates = float(data.get('x'))
-        y_coordinates = float(data.get('y'))
-        radius = float(data.get('radius')) if data.get('radius') else 100
-        # Get the current page number from request
-        page = int(request.GET.get('page', 1))
+    def calculate_required_radius(self, x, y):
+        return calculate_distance(x, y)
 
-        radius_required = calculate_distance(x_coordinates, y_coordinates)
-
+    def truck_extraction_query(self, radius_required, radius, interval=100):
         trucks = []
 
         while len(trucks) <= 5:
@@ -33,13 +27,31 @@ class TruckModelCreateView(View):
                 )
             ).order_by('shortest_distance')
 
-            radius += 100
+            radius += interval
 
-        print(f"Found food trucks at {radius}")
+        return trucks
 
-        per_page = 10
-        paginator = Paginator(trucks, per_page)
-        page_objects = paginator.get_page(page)
+    def pagination_setter(self, page_size=10):
+        per_page = page_size
+        if self.trucks:
+            self.paginator = Paginator(self.trucks, per_page)
+            page_objects = self.paginator.get_page(self.page)
+            return page_objects
+        return None
+
+    def post(self, request):
+        data = json.loads(request.body.decode('utf-8'))
+        self.x_coordinates = float(data.get('x'))
+        self.y_coordinates = float(data.get('y'))
+        self.radius = float(data.get('radius')) if data.get('radius') else 100
+        # Get the current page number from request
+        self.page = int(request.GET.get('page', 1))
+
+        radius_required = self.calculate_required_radius(
+            self.x_coordinates, self.y_coordinates)
+
+        self.trucks = self.truck_extraction_query(radius_required, self.radius)
+        page_objects = self.pagination_setter()
 
         serialized_trucks = serialize('json', page_objects)
 
@@ -47,6 +59,6 @@ class TruckModelCreateView(View):
             'trucks': serialized_trucks,
             'has_next': page_objects.has_next(),
             'has_previous': page_objects.has_previous(),
-            'total_pages': paginator.num_pages,
+            'total_pages': self.paginator.num_pages,
             'current_page': page_objects.number
         }, safe=False)

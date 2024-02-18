@@ -42,7 +42,7 @@ class TruckModel(models.Model):
         return await round(distance, 8)
 
     async def save(self, *args, **kwargs):
-        self.rel_distance = await self.calculate_distance_async(self.locationx, self.locationy)
+        self.rel_distance = await self.calculate_distance_async(self.locationx, self.locationy)  # noqa
         await super(TruckModel, self).save(*args, **kwargs)
 
     def __str__(self):

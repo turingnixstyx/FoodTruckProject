@@ -42,11 +42,12 @@ const App: React.FC = () => {
   const {
     register,
     handleSubmit,
-    formState: { errors, isValid },
+    formState: { isValid },
   } = useForm<Location>();
 
   const fetchTrucks = async (data: Location, nextPage: number = 1) => {
     try {
+      console.log(data);
       const response = await axios.post<TrucksResponse>(
         `http://localhost:8000/location/?page=${nextPage}`,
         data
@@ -120,6 +121,7 @@ const App: React.FC = () => {
           Submit
         </button>
       </form>
+
       <h1>Trucks</h1>
       <div className="tableDiv">
         <table className="table">
@@ -145,11 +147,17 @@ const App: React.FC = () => {
       </div>
 
       <div>
-        <button onClick={handlePreviousPage} disabled={page === 1}>
+        <button
+          onClick={handlePreviousPage}
+          className="buttonMove"
+          disabled={page === 1}
+        >
           Previous Page
         </button>
         <span>Page {page}</span>
-        <button onClick={handleNextPage}>Next Page</button>
+        <button onClick={handleNextPage} className="buttonMove">
+          Next Page
+        </button>
       </div>
     </>
   );
