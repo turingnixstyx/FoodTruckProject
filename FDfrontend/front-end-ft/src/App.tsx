@@ -136,7 +136,7 @@ const App: React.FC = () => {
           <tbody>
             {trucks.map((truck, index) => (
               <tr>
-                <th scope="row">{index}</th>
+                <th scope="row">{index + 1}</th>
                 <td>{truck.fields.name}</td>
                 <td>{truck.fields.type}</td>
                 <td>{truck.fields.status}</td>
