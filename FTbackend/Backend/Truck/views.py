@@ -19,22 +19,28 @@ class TruckModelCreateView(View):
 
         radius_required = calculate_distance(x_coordinates, y_coordinates)
 
-        trucks = TruckModel.objects.filter(
-            rel_distance__gte=radius_required - radius,
-            rel_distance__lte=radius_required + radius,
-        ).annotate(
-            shortest_distance=ExpressionWrapper(
-                F('rel_distance') - radius_required,
-                output_field=FloatField()
-            )
-        ).order_by('shortest_distance')
+        trucks = []
 
-        # Pagination
-        per_page = 10  # Number of items per page
+        while len(trucks) <= 5:
+
+            trucks = TruckModel.objects.filter(
+                rel_distance__gte=radius_required - radius,
+                rel_distance__lte=radius_required + radius,
+            ).annotate(
+                shortest_distance=ExpressionWrapper(
+                    F('rel_distance') - radius_required,
+                    output_field=FloatField()
+                )
+            ).order_by('shortest_distance')
+
+            radius += 100
+
+        print(f"Found food trucks at {radius}")
+
+        per_page = 10
         paginator = Paginator(trucks, per_page)
         page_objects = paginator.get_page(page)
 
-        # Serialize page_objects
         serialized_trucks = serialize('json', page_objects)
 
         return JsonResponse({

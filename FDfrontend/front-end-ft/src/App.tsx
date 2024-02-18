@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useForm, SubmitHandler } from "react-hook-form";
 import "bootstrap/dist/css/bootstrap.min.css";
+import "./App.css";
 
 interface Location {
   x: number;
@@ -86,6 +87,7 @@ const App: React.FC = () => {
           <input
             {...register("x", { required: true })}
             type="number"
+            step="any"
             className="form-control"
             id="XCord"
           />
@@ -97,6 +99,7 @@ const App: React.FC = () => {
           <input
             {...register("y", { required: true })}
             type="number"
+            step="any"
             className="form-control"
             id="YCord"
           />
@@ -108,6 +111,7 @@ const App: React.FC = () => {
           <input
             {...register("radius")}
             type="number"
+            step="any"
             className="form-control"
             id="radius"
           />
@@ -116,48 +120,29 @@ const App: React.FC = () => {
           Submit
         </button>
       </form>
-
       <h1>Trucks</h1>
-      <ul>
-        {trucks.map((truck) => (
-          <li key={truck.pk}>
-            <h2>{truck.fields.name}</h2>
-            <p>Type: {truck.fields.type}</p>
-            <p>Status: {truck.fields.status}</p>
-            <p>Relative Distance: {truck.fields.rel_distance}</p>
-          </li>
-        ))}
-      </ul>
-
-      <table className="table">
-        <thead>
-          <tr>
-            <th scope="col">#</th>
-            <th scope="col">First</th>
-            <th scope="col">Last</th>
-            <th scope="col">Handle</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <th scope="row">1</th>
-            <td>Mark</td>
-            <td>Otto</td>
-            <td>@mdo</td>
-          </tr>
-          <tr>
-            <th scope="row">2</th>
-            <td>Jacob</td>
-            <td>Thornton</td>
-            <td>@fat</td>
-          </tr>
-          <tr>
-            <th scope="row">3</th>
-            <td colSpan="2">Larry the Bird</td>
-            <td>@twitter</td>
-          </tr>
-        </tbody>
-      </table>
+      <div className="tableDiv">
+        <table className="table">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">NAME</th>
+              <th scope="col">TYPE</th>
+              <th scope="col">STATUS</th>
+            </tr>
+          </thead>
+          <tbody>
+            {trucks.map((truck, index) => (
+              <tr>
+                <th scope="row">{index}</th>
+                <td>{truck.fields.name}</td>
+                <td>{truck.fields.type}</td>
+                <td>{truck.fields.status}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
       <div>
         <button onClick={handlePreviousPage} disabled={page === 1}>
